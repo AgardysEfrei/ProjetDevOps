@@ -9,7 +9,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Gateway/Gateway.csproj", "Gateway/"]
 RUN dotnet restore "Gateway/Gateway.csproj"
-COPY . .
+COPY ["Gateway/", "Gateway/"]
 WORKDIR "/src/Gateway"
 RUN dotnet build "./Gateway.csproj" -c "$BUILD_CONFIGURATION" -o /app/build
 
@@ -20,4 +20,9 @@ RUN dotnet publish "./Gateway.csproj" -c "$BUILD_CONFIGURATION" -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN useradd -r nonroot
+RUN chown -R nonroot /app
+USER nonroot
+
 ENTRYPOINT ["dotnet", "Gateway.dll"]
