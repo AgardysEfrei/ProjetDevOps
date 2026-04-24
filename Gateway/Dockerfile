@@ -21,8 +21,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-RUN useradd -r nonroot
-RUN chown -R nonroot /app
+RUN useradd -r nonroot \
+&& chown -R nonroot /app
 USER nonroot
 
 ENTRYPOINT ["dotnet", "Gateway.dll"]
