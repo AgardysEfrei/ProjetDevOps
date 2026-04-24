@@ -22,11 +22,21 @@ jobs:
         dotnet-version: 9.0.x
     - name: Restore dependencies
       run: dotnet restore
+      
     - name: Build
       run: dotnet build --no-restore
+      
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      
     - name: Install dotnet coverage
       run: dotnet tool install --global dotnet-coverage
+      
     - name: Coverage
       run: dotnet-coverage collect dotnet test --no-build -f xml  -o 'coverage.xml'
+      
+    - name: Install dotnet SonarScanner
+      run: dotnet tool install --global dotnet-sonarscanner |
+          dotnet sonarscanner begin /k:${{ vars.SONAR_PROJ_KEY }} /o:${{ vars.SONAR_ORG_KEY }} /d:sonar.token=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml|
+          dotnet build --no-incremental --disable-build-servers |
+          dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
