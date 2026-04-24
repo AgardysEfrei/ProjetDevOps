@@ -36,8 +36,10 @@ jobs:
       run: dotnet-coverage collect dotnet test --no-build -f xml  -o 'coverage.xml'
       
     - name: Install dotnet SonarScanner
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: | 
           dotnet tool install --global dotnet-sonarscanner
-          dotnet sonarscanner begin /k:${{ vars.SONAR_PROJ_KEY }} /o:${{ vars.SONAR_ORG_KEY }} /d:sonar.token=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          dotnet sonarscanner begin /k:${{ vars.SONAR_PROJ_KEY }} /o:${{ vars.SONAR_ORG_KEY }} /d:sonar.token=$SONAR_TOKEN /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build --no-incremental --disable-build-servers
-          dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
+          dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN
